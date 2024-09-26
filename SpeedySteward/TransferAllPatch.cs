@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
+using TaleWorlds.CampaignSystem.ComponentInterfaces;
 using TaleWorlds.CampaignSystem.Inventory;
 using TaleWorlds.CampaignSystem.Party;
 using TaleWorlds.CampaignSystem.ViewModelCollection.Inventory;
@@ -16,7 +17,7 @@ namespace SpeedySteward
     [HarmonyPatch(typeof(SPInventoryVM), "TransferAll")]
     public class TransferAllPatch
     {
-        public static bool Prefix(SPInventoryVM __instance, bool isBuy, InventoryLogic ____inventoryLogic, CharacterObject ____currentCharacter)
+        public static bool Prefix(SPInventoryVM __instance, bool isBuy, InventoryLogic ____inventoryLogic, CharacterObject ____currentCharacter, int ____donationMaxShareableXp)
         {
             __instance.IsRefreshed = false;
             List<TransferCommand> list = new List<TransferCommand>(__instance.LeftItemListVM.Count);
@@ -31,15 +32,33 @@ namespace SpeedySteward
             InventoryLogic.InventorySide inventorySide = (isBuy ? InventoryLogic.InventorySide.PlayerInventory : InventoryLogic.InventorySide.OtherInventory);
             List<SPItemVM> list2 = new List<SPItemVM>();
             bool flag2 = ____inventoryLogic.CanInventoryCapacityIncrease(inventorySide);
+
+            float trackedTransferXp = ____inventoryLogic.XpGainFromDonations;
+            bool startedInRedXp = false;
+            if (trackedTransferXp > ____donationMaxShareableXp)
+            {
+                startedInRedXp = true;
+            }
+
             for (int i = 0; i < mBBindingList.Count; i++)
             {
                 SPItemVM sPItemVM = mBBindingList[i];
                 if (sPItemVM == null || sPItemVM.IsFiltered || sPItemVM == null || sPItemVM.IsLocked || sPItemVM == null || !sPItemVM.IsTransferable)
                 {
-                    InformationManager.DisplayMessage(new InformationMessage("Item skipped..."));
                     continue;
                 }
                 int num3 = sPItemVM.ItemRosterElement.Amount;
+                if (____inventoryLogic.IsDiscardDonating && !startedInRedXp)
+                {
+                    ItemDiscardModel discardModel = Campaign.Current.Models.ItemDiscardModel;
+                    int xpBonusForDiscardingItem = discardModel.GetXpBonusForDiscardingItem(sPItemVM.ItemRosterElement.EquipmentElement.Item);
+                    // InformationManager.DisplayMessage(new InformationMessage(String.Format("Exp amount: {0} for {1}", xpBonusForDiscardingItem, sPItemVM.ItemDescription)));
+                    if (trackedTransferXp > ____donationMaxShareableXp)
+                    {
+                        break;
+                    }
+                    trackedTransferXp += xpBonusForDiscardingItem;
+                }
                 if (!flag)
                 {
                     float equipmentElementWeight = sPItemVM.ItemRosterElement.EquipmentElement.GetEquipmentElementWeight();
