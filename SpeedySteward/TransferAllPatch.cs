@@ -33,7 +33,7 @@ namespace SpeedySteward
             List<SPItemVM> list2 = new List<SPItemVM>();
             bool flag2 = ____inventoryLogic.CanInventoryCapacityIncrease(inventorySide);
 
-            float trackedTransferXp = ____inventoryLogic.XpGainFromDonations;
+            int trackedTransferXp = (int) ____inventoryLogic.XpGainFromDonations;
             bool startedInRedXp = false;
             if (trackedTransferXp > ____donationMaxShareableXp)
             {
@@ -47,18 +47,31 @@ namespace SpeedySteward
                 {
                     continue;
                 }
+
                 int num3 = sPItemVM.ItemRosterElement.Amount;
-                if (____inventoryLogic.IsDiscardDonating && !startedInRedXp)
+                if (____inventoryLogic.IsDiscardDonating && !isBuy && !startedInRedXp)
                 {
+                    if (trackedTransferXp >= ____donationMaxShareableXp)
+                    {
+                        continue;
+                    }
+
                     ItemDiscardModel discardModel = Campaign.Current.Models.ItemDiscardModel;
                     int xpBonusForDiscardingItem = discardModel.GetXpBonusForDiscardingItem(sPItemVM.ItemRosterElement.EquipmentElement.Item);
-                    // InformationManager.DisplayMessage(new InformationMessage(String.Format("Exp amount: {0} for {1}", xpBonusForDiscardingItem, sPItemVM.ItemDescription)));
-                    if (trackedTransferXp > ____donationMaxShareableXp)
+                    for (int n = 1; n <= num3; n++)
                     {
-                        break;
+                        trackedTransferXp += xpBonusForDiscardingItem;
+                        if (trackedTransferXp >= ____donationMaxShareableXp)
+                        {
+                            num3 -= (num3 - n);
+                            var expMessage = new InformationMessage(String.Format("Stack for {0} changed from {1} to {2}",
+                                sPItemVM.ItemRosterElement.EquipmentElement.Item, num3 + n, num3));
+                            InformationManager.DisplayMessage(expMessage);
+                            break;
+                        }
                     }
-                    trackedTransferXp += xpBonusForDiscardingItem;
                 }
+
                 if (!flag)
                 {
                     float equipmentElementWeight = sPItemVM.ItemRosterElement.EquipmentElement.GetEquipmentElementWeight();
