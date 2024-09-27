@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using HarmonyLib;
 using TaleWorlds.CampaignSystem;
 using TaleWorlds.CampaignSystem.ComponentInterfaces;
@@ -33,11 +31,17 @@ namespace SpeedySteward
             List<SPItemVM> list2 = new List<SPItemVM>();
             bool flag2 = ____inventoryLogic.CanInventoryCapacityIncrease(inventorySide);
 
+            // begin donation logic changes (jeniferirwin)
             int trackedTransferXp = (int) ____inventoryLogic.XpGainFromDonations;
-            bool startedInRedXp = false;
+
+            // isDonationAlreadyMax allows the player to choose to go ahead
+            // and drop everything with a second Transfer All, similar
+            // to how you can force yourself to overburden
+            bool isDonationAlreadyMax = false;
+
             if (trackedTransferXp > ____donationMaxShareableXp)
             {
-                startedInRedXp = true;
+                isDonationAlreadyMax = true;
             }
 
             for (int i = 0; i < mBBindingList.Count; i++)
@@ -49,28 +53,27 @@ namespace SpeedySteward
                 }
 
                 int num3 = sPItemVM.ItemRosterElement.Amount;
-                if (____inventoryLogic.IsDiscardDonating && !isBuy && !startedInRedXp)
+                ItemDiscardModel discardModel = Campaign.Current.Models.ItemDiscardModel;
+                int xpBonusForDiscardingItem = discardModel.GetXpBonusForDiscardingItem(sPItemVM.ItemRosterElement.EquipmentElement.Item);
+
+                if (____inventoryLogic.IsDiscardDonating && !isBuy && !isDonationAlreadyMax && xpBonusForDiscardingItem > 0)
                 {
                     if (trackedTransferXp >= ____donationMaxShareableXp)
                     {
                         continue;
                     }
 
-                    ItemDiscardModel discardModel = Campaign.Current.Models.ItemDiscardModel;
-                    int xpBonusForDiscardingItem = discardModel.GetXpBonusForDiscardingItem(sPItemVM.ItemRosterElement.EquipmentElement.Item);
                     for (int n = 1; n <= num3; n++)
                     {
                         trackedTransferXp += xpBonusForDiscardingItem;
                         if (trackedTransferXp >= ____donationMaxShareableXp)
                         {
                             num3 -= (num3 - n);
-                            var expMessage = new InformationMessage(String.Format("Stack for {0} changed from {1} to {2}",
-                                sPItemVM.ItemRosterElement.EquipmentElement.Item, num3 + n, num3));
-                            InformationManager.DisplayMessage(expMessage);
                             break;
                         }
                     }
                 }
+                // end donation logic changes (jeniferirwin)
 
                 if (!flag)
                 {

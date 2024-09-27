@@ -248,7 +248,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DonationChangePatch.cs" />
-    <Compile Include="InventoryInitializePatch.cs" />
     <Compile Include="TransferAllPatch.cs" />
     <Compile Include="SubModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
