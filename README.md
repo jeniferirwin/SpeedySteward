@@ -1,6 +1,6 @@
 # SpeedySteward
 
-This is the source code a mod for Mount & Blade II: Bannerlord.
+This is the source code for a mod for Mount & Blade II: Bannerlord.
 
 The release itself can be downloaded over at Nexus: https://www.nexusmods.com/mountandblade2bannerlord/mods/7297
 
