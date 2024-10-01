@@ -1,6 +1,9 @@
 # SpeedySteward
 
-This is a mod for Mount & Blade II: Bannerlord. Use of the mod requires the Harmony library: https://www.nexusmods.com/mountandblade2bannerlord/mods/2006
+This is the source code a mod for Mount & Blade II: Bannerlord.
+
+The release itself can be downloaded over at Nexus: https://www.nexusmods.com/mountandblade2bannerlord/mods/7297
+Use and compilation of the mod requires the Harmony library: https://www.nexusmods.com/mountandblade2bannerlord/mods/2006
 
 This mod greatly simplifies the process of donating gear for troop experience.
 
@@ -16,4 +19,4 @@ Transfer All can be activated a second time to go ahead and drop everything, eve
 
 The mod respects item locks and filters. It can also be a great way to keep your inventory tidy - sort by ascending # of items and it will prioritize donating all those really small stacks you end up with that can end up lagging your inventory.
 
-When combined with a mod like Party Screen Enhancements that allows for automated troop upgrade, you can raise an army of max-tier troops in just seconds with zero waste.
+When combined with a mod like Party Screen Enhancements Redux that allows for automated troop upgrade, you can raise an army of max-tier troops in just seconds with zero waste: https://www.nexusmods.com/mountandblade2bannerlord/mods/6237
